@@ -1,4 +1,8 @@
-const { getTopicsModel, getEndpointsModel } = require("../models/model");
+const {
+  getTopicsModel,
+  getEndpointsModel,
+  getArticlesModel,
+} = require("../models/model");
 
 exports.getTopics = (req, res, next) => {
   return getTopicsModel()
@@ -11,9 +15,18 @@ exports.getTopics = (req, res, next) => {
 };
 
 exports.getEndpoints = (req, res, next) => {
-  console.log("herre");
   return getEndpointsModel().then((data) => {
-    console.log(data);
     res.status(200).send(data);
   });
+};
+
+exports.getArticles = (req, res, next) => {
+  const id = req.params.id;
+  return getArticlesModel(id)
+    .then((data) => {
+      res.status(200).send(data);
+    })
+    .catch((err) => {
+      next(err);
+    });
 };
