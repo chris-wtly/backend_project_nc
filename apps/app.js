@@ -1,17 +1,13 @@
 const express = require("express");
 const app = express();
 
-const { getTopics, getTopicsById } = require("../controllers/controller");
+const { getTopics, getEndpoints } = require("../controllers/controller");
 
 app.use(express.json());
 
 app.get("/api/topics", getTopics);
 
-app.use((err, req, res, next) => {
-  console.log("here");
-  res.status(400).send({ msg: "Bad request - invalid Id" });
-  next();
-});
+app.get("/api", getEndpoints);
 
 // Invalid endpoint - Get - Default Error Handler
 app.use((req, res, next) => {

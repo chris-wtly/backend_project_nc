@@ -36,3 +36,17 @@ describe("/get/api/topics", () => {
       });
   });
 });
+describe("/get/api ", () => {
+  it("200: Should return a list of all endpoints", () => {
+    return request(app)
+      .get("/api")
+      .expect(200)
+      .then((data) => {
+        data = JSON.parse(data.text);
+        console.log(data);
+        expect(data).toHaveProperty("GET /api");
+        expect(data).toHaveProperty("GET /api/topics");
+        expect(data).toHaveProperty("GET /api/articles");
+      });
+  });
+});
