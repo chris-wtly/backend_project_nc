@@ -27,4 +27,12 @@ describe("/get/api/topics", () => {
         });
       });
   });
+  it("404: Should return an error for an endpoint that dosn't exist", () => {
+    return request(app)
+      .get("/api/hello")
+      .expect(404)
+      .then((response) => {
+        expect(response.body.msg).toBe("Page not found");
+      });
+  });
 });

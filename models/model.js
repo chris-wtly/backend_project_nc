@@ -1,9 +1,10 @@
 const db = require("../db/connection");
 
 exports.getTopicsModel = () => {
-  console.log("hitting model");
   return db.query(`SELECT * FROM topics`).then(({ rows }) => {
-    console.log(rows);
+    if (rows.length === 0) {
+      return Promise.reject({ msg: "Invalid Query" });
+    }
     return rows;
   });
 };
