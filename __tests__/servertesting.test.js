@@ -307,3 +307,42 @@ describe("api/artciles/:article_id/comments", () => {
       });
   });
 });
+
+describe("/post/api/articles/:article_id/comments", () => {
+  it("201: Should post a comment on an article, the posted comment should be made of a username and a body", () => {
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send({ author: "butter_bridge", body: "AAAAHHHH!" })
+      .expect(201)
+      .then(({ body }) => {
+        expect(body).toMatchObject({
+          comment_posted: {
+            author: "butter_bridge",
+            body: "AAAAHHHH!",
+            comment_id: expect.any(Number),
+            created_at: expect.any(String),
+            votes: 0,
+            article_id: 1,
+          },
+        });
+      });
+  });
+  it("400: returns error for missing fields", () => {
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send({})
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("bad request");
+      });
+  });
+  it("400: returns error for incorrect data types", () => {
+    return request(app)
+      .post("/api/articles/1/comments")
+      .send({ author: 5, body: 11 })
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("bad request");
+      });
+  });
+});

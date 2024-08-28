@@ -1,6 +1,7 @@
 const db = require("../db/connection");
 const fs = require("fs/promises");
 const { exists } = require("../utilsFunctions");
+const pg = require("pg-format");
 
 exports.getTopicsModel = () => {
   return db.query(`SELECT * FROM topics`).then(({ rows }) => {
@@ -66,4 +67,15 @@ exports.getArticleCommentsModel = (id) => {
     .then((rows) => {
       return { comments: rows };
     });
+};
+
+exports.postCommentModel = (id, data) => {
+  const itemsInsertStr = pg(
+    `INSERT INTO comments (author, body, article_id) VALUES %L RETURNING body, votes, author, article_id, to_char(created_at, 'YYYY-MM-DD HH24:MI:SS') as created_at, comment_id ;`,
+    [[data.author, data.body, id]]
+  );
+
+  return db.query(itemsInsertStr).then(({ rows }) => {
+    return { comment_posted: rows[0] };
+  });
 };

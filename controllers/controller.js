@@ -4,6 +4,7 @@ const {
   getArticlesModel,
   getArticlesByIdModel,
   getArticleCommentsModel,
+  postCommentModel,
 } = require("../models/model");
 
 exports.getTopics = (req, res, next) => {
@@ -48,6 +49,18 @@ exports.getArticleComments = (req, res, next) => {
   return getArticleCommentsModel(id)
     .then((data) => {
       res.status(200).send(data);
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.postComment = (req, res, next) => {
+  const data = req.body;
+  const id = req.params.id;
+  return postCommentModel(id, data)
+    .then((data) => {
+      res.status(201).send(data);
     })
     .catch((err) => {
       next(err);
