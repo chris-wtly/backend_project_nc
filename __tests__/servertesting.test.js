@@ -248,3 +248,62 @@ it("200: Should return an array of articles with appropriate keys", () => {
       expect(articles).toBeSortedBy("created_at", { descending: true });
     });
 });
+describe("api/artciles/:article_id/comments", () => {
+  it("200: Should return an array of comments based on a parametric id. The object should have all apropriate keys", () => {
+    return request(app)
+      .get("/api/articles/9/comments")
+      .expect(200)
+      .then(({ body: { comments } }) => {
+        expect(comments).toEqual([
+          {
+            body: "Oh, I've got compassion running out of my nose, pal! I'm the Sultan of Sentiment!",
+            votes: 16,
+            author: "butter_bridge",
+            article_id: 9,
+            created_at: "2020-04-06 13:17:00",
+            comment_id: 1,
+          },
+          {
+            body: "The owls are not what they seem.",
+            votes: 20,
+            author: "icellusedkars",
+            article_id: 9,
+            created_at: "2020-03-14 17:02:00",
+            comment_id: 17,
+          },
+        ]);
+      });
+  });
+  it("200: Should serve newest comment first", () => {
+    return request(app)
+      .get("/api/articles/5/comments")
+      .expect(200)
+      .then(({ body: { comments } }) => {
+        expect(comments).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+  it("200: Should return empty array for article with no comments", () => {
+    return request(app)
+      .get("/api/articles/4/comments")
+      .expect(200)
+      .then(({ body: { comments } }) => {
+        expect(comments).toEqual([]);
+      });
+  });
+  it("400: Should return error for bad id type", () => {
+    return request(app)
+      .get("/api/articles/yes/comments")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad request - bad Id");
+      });
+  });
+  it("404: Should return error for bad id type", () => {
+    return request(app)
+      .get("/api/articles/10000/comments")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Page not found - invalid Id");
+      });
+  });
+});
