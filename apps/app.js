@@ -7,6 +7,7 @@ const {
   getArticlesById,
   getArticles,
   getArticleComments,
+  postComment,
 } = require("../controllers/controller");
 
 app.use(express.json());
@@ -21,6 +22,8 @@ app.get("/api/articles", getArticles);
 
 app.get("/api/articles/:id/comments", getArticleComments);
 
+app.post("/api/articles/:id/comments", postComment);
+
 app.use((err, req, res, next) => {
   if (err.msg === "Page not found - invalid Id") res.status(404).send(err);
   next(err);
@@ -30,6 +33,12 @@ app.use((err, req, res, next) => {
   if (err.code === "22P02")
     res.status(400).send({ msg: "Bad request - bad Id" });
   next(err);
+});
+
+app.use((err, req, res, next) => {
+  if (err) {
+    res.status(400).send({ msg: "bad request" });
+  }
 });
 
 // Invalid endpoint - Get - Default Error Handler
