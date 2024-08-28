@@ -79,3 +79,17 @@ exports.postCommentModel = (id, data) => {
     return { comment_posted: rows[0] };
   });
 };
+
+exports.patchArticleModel = (id, data) => {
+  return db
+    .query(
+      `UPDATE articles SET votes = votes + $1 WHERE article_id = $2 returning *, to_char(created_at, 'YYYY-MM-DD HH24:MI:SS') as created_at`,
+      [data.inc_votes, id]
+    )
+    .then(({ rows }) => {
+      if (rows.length === 0) {
+        return Promise.reject({ msg: "Page not found - invalid Id" });
+      }
+      return rows[0];
+    });
+};
