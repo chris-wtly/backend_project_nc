@@ -16,7 +16,29 @@ exports.getEndpointsModel = () => {
   });
 };
 
-exports.getArticlesModel = (id) => {
+exports.getArticlesModel = () => {
+  return db
+    .query(`SELECT * FROM articles ORDER BY created_at DESC`)
+    .then(({ rows }) => {
+      const articleArray = rows.map((article) => {
+        return db
+          .query(`SELECT * FROM comments WHERE article_id = $1`, [
+            article.article_id,
+          ])
+          .then(({ rows }) => {
+            article.comment_count = rows.length;
+            delete article.body;
+            return article;
+          });
+      });
+      return Promise.all(articleArray);
+    })
+    .then((data) => {
+      return { articles: data };
+    });
+};
+
+exports.getArticlesByIdModel = (id) => {
   return db
     .query(`SELECT * FROM articles WHERE article_id = $1`, [id])
     .then(({ rows }) => {
