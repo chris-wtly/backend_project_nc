@@ -4,6 +4,7 @@ const app = express();
 const {
   getTopics,
   getEndpoints,
+  getArticlesById,
   getArticles,
 } = require("../controllers/controller");
 
@@ -13,7 +14,9 @@ app.get("/api/topics", getTopics);
 
 app.get("/api", getEndpoints);
 
-app.get("/api/articles/:id", getArticles);
+app.get("/api/articles/:id", getArticlesById);
+
+app.get("/api/articles", getArticles);
 
 app.use((err, req, res, next) => {
   if (err.msg === "Page not found - invalid Id") res.status(404).send(err);
