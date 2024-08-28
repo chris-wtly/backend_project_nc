@@ -3,6 +3,7 @@ const {
   getEndpointsModel,
   getArticlesModel,
   getArticlesByIdModel,
+  getArticleCommentsModel,
 } = require("../models/model");
 
 exports.getTopics = (req, res, next) => {
@@ -34,6 +35,17 @@ exports.getArticles = (req, res, next) => {
 exports.getArticlesById = (req, res, next) => {
   const id = req.params.id;
   return getArticlesByIdModel(id)
+    .then((data) => {
+      res.status(200).send(data);
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.getArticleComments = (req, res, next) => {
+  const id = req.params.id;
+  return getArticleCommentsModel(id)
     .then((data) => {
       res.status(200).send(data);
     })

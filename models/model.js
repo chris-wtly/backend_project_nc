@@ -1,5 +1,6 @@
 const db = require("../db/connection");
 const fs = require("fs/promises");
+const { exists } = require("../utilsFunctions");
 
 exports.getTopicsModel = () => {
   return db.query(`SELECT * FROM topics`).then(({ rows }) => {
@@ -46,5 +47,23 @@ exports.getArticlesByIdModel = (id) => {
         return Promise.reject({ msg: "Page not found - invalid Id" });
       }
       return { articles: rows };
+    });
+};
+
+exports.getArticleCommentsModel = (id) => {
+  return db
+    .query(
+      `SELECT body, votes, author, article_id, to_char(created_at, 'YYYY-MM-DD HH24:MI:SS') as created_at, comment_id FROM comments WHERE article_id = $1 ORDER BY created_at DESC`,
+      [id]
+    )
+    .then(({ rows }) => {
+      if (rows.length < 1) {
+        return exists("articles", id);
+      } else {
+        return rows;
+      }
+    })
+    .then((rows) => {
+      return { comments: rows };
     });
 };
