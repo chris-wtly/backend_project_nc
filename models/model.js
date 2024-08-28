@@ -93,3 +93,13 @@ exports.patchArticleModel = (id, data) => {
       return rows[0];
     });
 };
+
+exports.deleteCommentModel = (id) => {
+  return db
+    .query(`DELETE FROM comments WHERE comment_id = $1 RETURNING *`, [id])
+    .then(({ rows }) => {
+      if (!rows.length) {
+        return Promise.reject({ msg: "delete err" });
+      }
+    });
+};

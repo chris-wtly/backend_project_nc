@@ -420,3 +420,25 @@ describe("patch/api/articles/:article_id", () => {
       });
   });
 });
+
+describe("delete/api/comments/:comment_id", () => {
+  it("204: Should delete the comment by the given id and return no content", () => {
+    return request(app).delete("/api/comments/2").expect(204);
+  });
+  it("400: Should return error for comment that doesn't exist", () => {
+    return request(app)
+      .delete("/api/comments/1000000")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("can't delete");
+      });
+  });
+  it("400: Should return error for comment that ", () => {
+    return request(app)
+      .delete("/api/comments/viking")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad request - bad Id");
+      });
+  });
+});
