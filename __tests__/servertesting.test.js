@@ -346,3 +346,77 @@ describe("/post/api/articles/:article_id/comments", () => {
       });
   });
 });
+describe("patch/api/articles/:article_id", () => {
+  it("200: Should update the articles votes and returns the updated article", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({ inc_votes: 2 })
+      .expect(200)
+      .then(({ body }) => {
+        expect(body).toMatchObject({
+          title: "Living in the shadow of a great man",
+          topic: "mitch",
+          author: "butter_bridge",
+          body: "I find this existence challenging",
+          created_at: "2020-07-09 21:11:00",
+          votes: 102,
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+        });
+      });
+  });
+  it("200: Does the same for a negative vote count", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({ inc_votes: -102 })
+      .expect(200)
+      .then(({ body }) => {
+        expect(body).toMatchObject({
+          title: "Living in the shadow of a great man",
+          topic: "mitch",
+          author: "butter_bridge",
+          body: "I find this existence challenging",
+          created_at: "2020-07-09 21:11:00",
+          votes: -2,
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+        });
+      });
+  });
+  it("400: Returns error for missing fields", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({})
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("bad request");
+      });
+  });
+  it("400: Returns error for fields with correct fields", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({ inc_votes: "hello" })
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad request - bad Id");
+      });
+  });
+  it("404: Returns error for incorrect id", () => {
+    return request(app)
+      .patch("/api/articles/1000")
+      .send({ inc_votes: 4 })
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Page not found - invalid Id");
+      });
+  });
+  it("400: Returns error for invalid id", () => {
+    return request(app)
+      .patch("/api/articles/green")
+      .send({ inc_votes: 4 })
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad request - bad Id");
+      });
+  });
+});
