@@ -10,6 +10,7 @@ const {
   postComment,
   patchArticle,
   deleteComment,
+  getUsers,
 } = require("../controllers/controller");
 
 app.use(express.json());
@@ -29,6 +30,8 @@ app.post("/api/articles/:id/comments", postComment);
 app.patch("/api/articles/:id", patchArticle);
 
 app.delete("/api/comments/:id", deleteComment);
+
+app.get("/api/users", getUsers);
 
 app.use((err, req, res, next) => {
   if (err.msg === "Page not found - invalid Id") res.status(404).send(err);

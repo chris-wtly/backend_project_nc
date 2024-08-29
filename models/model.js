@@ -103,3 +103,9 @@ exports.deleteCommentModel = (id) => {
       }
     });
 };
+
+exports.getUsersModel = () => {
+  return db.query(`SELECT * FROM users`).then(({ rows }) => {
+    return { users: rows };
+  });
+};
