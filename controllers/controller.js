@@ -7,6 +7,7 @@ const {
   postCommentModel,
   patchArticleModel,
   deleteCommentModel,
+  getUsersModel,
 } = require("../models/model");
 
 exports.getTopics = (req, res, next) => {
@@ -86,6 +87,16 @@ exports.deleteComment = (req, res, next) => {
   return deleteCommentModel(id)
     .then(() => {
       res.status(204).send();
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.getUsers = (req, res, next) => {
+  return getUsersModel()
+    .then((data) => {
+      res.status(200).send(data);
     })
     .catch((err) => {
       next(err);
