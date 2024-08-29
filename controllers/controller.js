@@ -78,6 +78,9 @@ exports.patchArticle = (req, res, next) => {
       res.status(200).send(data);
     })
     .catch((err) => {
+      if (err.code === "22P02") {
+        err = { msg: "bad fields" };
+      }
       next(err);
     });
 };

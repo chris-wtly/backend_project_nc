@@ -81,6 +81,9 @@ exports.postCommentModel = (id, data) => {
 };
 
 exports.patchArticleModel = (id, data) => {
+  if (Number(id) * 0 !== 0) {
+    return Promise.reject({ msg: "invalid_id" });
+  }
   return db
     .query(
       `UPDATE articles SET votes = votes + $1 WHERE article_id = $2 returning *, to_char(created_at, 'YYYY-MM-DD HH24:MI:SS') as created_at`,
@@ -88,7 +91,7 @@ exports.patchArticleModel = (id, data) => {
     )
     .then(({ rows }) => {
       if (rows.length === 0) {
-        return Promise.reject({ msg: "Page not found - invalid Id" });
+        return Promise.reject({ msg: "Id_incorrect" });
       }
       return rows[0];
     });

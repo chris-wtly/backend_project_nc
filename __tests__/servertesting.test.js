@@ -333,7 +333,7 @@ describe("/post/api/articles/:article_id/comments", () => {
       .send({})
       .expect(400)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("bad request");
+        expect(msg).toBe("bad request - bad fields");
       });
   });
   it("400: returns error for incorrect data types", () => {
@@ -389,25 +389,25 @@ describe("patch/api/articles/:article_id", () => {
       .send({})
       .expect(400)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("bad request");
+        expect(msg).toBe("bad request - bad fields");
       });
   });
-  it("400: Returns error for fields with correct fields", () => {
+  it("400: Returns error for incorrect fields", () => {
     return request(app)
       .patch("/api/articles/1")
       .send({ inc_votes: "hello" })
       .expect(400)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("Bad request - bad Id");
+        expect(msg).toBe("bad request - bad fields");
       });
   });
-  it("404: Returns error for incorrect id", () => {
+  it("400: Returns error for incorrect id of valid type", () => {
     return request(app)
       .patch("/api/articles/1000")
       .send({ inc_votes: 4 })
-      .expect(404)
+      .expect(400)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("Page not found - invalid Id");
+        expect(msg).toBe("Bad Request - bad Id");
       });
   });
   it("400: Returns error for invalid id", () => {
@@ -416,7 +416,7 @@ describe("patch/api/articles/:article_id", () => {
       .send({ inc_votes: 4 })
       .expect(400)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("Bad request - bad Id");
+        expect(msg).toBe("Bad Request - bad Id");
       });
   });
 });
@@ -433,7 +433,7 @@ describe("delete/api/comments/:comment_id", () => {
         expect(msg).toBe("can't delete");
       });
   });
-  it("400: Should return error for comment that ", () => {
+  it("400: Should return error for comment that doesn't exist", () => {
     return request(app)
       .delete("/api/comments/viking")
       .expect(400)

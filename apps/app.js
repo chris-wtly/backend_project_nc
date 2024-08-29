@@ -52,6 +52,20 @@ app.use((err, req, res, next) => {
 });
 
 app.use((err, req, res, next) => {
+  if (err.msg === "bad fields" || err.code === "23502") {
+    res.status(400).send({ msg: "bad request - bad fields" });
+  }
+  next(err);
+});
+
+app.use((err, req, res, next) => {
+  if (err.msg === "invalid_id" || err.msg === "Id_incorrect") {
+    res.status(400).send({ msg: "Bad Request - bad Id" });
+  }
+  next(err);
+});
+
+app.use((err, req, res, next) => {
   if (err) {
     res.status(400).send({ msg: "bad request" });
   }
