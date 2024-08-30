@@ -477,3 +477,53 @@ describe("get/api/users", () => {
       });
   });
 });
+describe("GET api/articles?sort_by", () => {
+  it("200: Should return articles sorted by created_at column in a descenidng order when no other queries are provided", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+  it("200: Should return articles sorted by the given column, sorted by descending when no other query is given", () => {
+    return request(app)
+      .get("/api/articles?sort_by=topic")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toBeSortedBy("topic", { descending: true });
+      });
+  });
+  it("200: Should return articles sorted by the given column and direction (i.e. asc/desc)", () => {
+    return request(app)
+      .get("/api/articles?sort_by=title&&order=ASC")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toBeSortedBy("title", { ascending: true });
+      });
+  });
+  it("200: Should return articles sorted by the given direction (i.e. asc/desc) without a column query", () => {
+    return request(app)
+      .get("/api/articles?order=ASC")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toBeSortedBy("created_at", { ascending: true });
+      });
+  });
+  it("200: Should return default when given an invalid query method", () => {
+    return request(app)
+      .get("/api/articles?bannana=ASC")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+  it("400: Should return error when given an incorrect query value", () => {
+    return request(app)
+      .get("/api/articles?sort_by=hello")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("bad request - bad query");
+      });
+  });
+});

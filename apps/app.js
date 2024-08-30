@@ -34,6 +34,13 @@ app.delete("/api/comments/:id", deleteComment);
 app.get("/api/users", getUsers);
 
 app.use((err, req, res, next) => {
+  if (err.code === "42703" || err.msg === "bad query") {
+    res.status(400).send({ msg: "bad request - bad query" });
+  }
+  next(err);
+});
+
+app.use((err, req, res, next) => {
   if (err.msg === "Page not found - invalid Id") res.status(404).send(err);
   next(err);
 });

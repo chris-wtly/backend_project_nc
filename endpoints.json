@@ -86,6 +86,44 @@
         "description": "Deletes comment by given id",
         "queries": [],
         "exampleResponse": { "204": "no content" }
+      },
+      "GET /api/articles/?sort_by=&&order=": {
+        "description": "Sort_by serves articles sorted by the given query, this can be either ascending or descending as defined by second the query named order",
+        "queries": ["sort_by", "order"],
+        "exampleResponse": {
+          "articles": [
+            {
+              "article_id": 6,
+              "title": "'A'",
+              "topic": "'mitch'",
+              "author": "'icellusedkars'",
+              "created_at": "'2020-10-18T01:00:00.000Z'",
+              "votes": 0,
+              "article_img_url": "'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700'",
+              "comment_count": 1
+            },
+            {
+              "article_id": 11,
+              "title": "'Am I a cat?'",
+              "topic": "'mitch'",
+              "author": "'icellusedkars'",
+              "created_at": "'2020-01-15T22:21:00.000Z'",
+              "votes": 0,
+              "article_img_url": "'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700'",
+              "comment_count": 0
+            },
+            {
+              "article_id": 13,
+              "title": "'Another article about Mitch'",
+              "topic": "'mitch'",
+              "author": "'butter_bridge'",
+              "created_at": "'2020-10-11T11:24:00.000Z'",
+              "votes": 0,
+              "article_img_url": "'https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700'",
+              "comment_count": 0
+            }
+          ]
+        }
       }
     }
   }

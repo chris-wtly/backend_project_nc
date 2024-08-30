@@ -27,7 +27,11 @@ exports.getEndpoints = (req, res, next) => {
 };
 
 exports.getArticles = (req, res, next) => {
-  return getArticlesModel()
+  let lineQuery = {};
+  if (Object.keys(req.query).length !== 0) {
+    lineQuery = req.query;
+  }
+  return getArticlesModel(lineQuery)
     .then((data) => {
       res.status(200).send(data);
     })
