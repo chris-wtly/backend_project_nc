@@ -1,6 +1,6 @@
 const db = require("../db/connection");
 const fs = require("fs/promises");
-const { exists } = require("../utilsFunctions");
+const { exists, existsTopic } = require("../utilsFunctions");
 const pg = require("pg-format");
 const { articleData } = require("../db/data/test-data");
 
@@ -20,42 +20,48 @@ exports.getEndpointsModel = () => {
 };
 
 exports.getArticlesModel = (lineQuery) => {
+  const { sort_by, order, topic } = lineQuery;
   let queryValues = [];
   let queryStr = `SELECT * FROM articles`;
 
-  if (lineQuery.sort_by !== undefined) {
+  if (topic !== undefined) {
+    queryStr += ` WHERE topic = %L`;
+    queryValues.push(topic);
+  }
+
+  if (sort_by !== undefined) {
     queryStr += ` ORDER BY %I`;
-    if (lineQuery.sort_by === "") {
+    if (sort_by === "") {
       queryValues.push("created_at");
     } else {
       queryValues.push(lineQuery.sort_by);
     }
-    if (!lineQuery.order) {
+    if (!order) {
       queryStr += ` DESC`;
     } else {
       queryStr += ` ASC`;
     }
   } else {
-    if (!lineQuery.order) {
+    if (!order) {
       queryStr += ` ORDER BY created_at DESC`;
     } else {
-      queryStr += ` ORDER BY created_at ASC`;
+      queryStr += ` ORDER BY created_at %s`;
+      queryValues.push(order);
     }
   }
 
-  if (
-    lineQuery.order !== "ASC" &&
-    lineQuery.order !== "DESC" &&
-    lineQuery.order !== undefined
-  ) {
+  if (order !== "ASC" && order !== "DESC" && order !== undefined) {
     return Promise.reject({ msg: "bad query" });
   }
 
-  const pgString = pg(queryStr, queryValues);
+  const pgString = pg(queryStr, queryValues[0], queryValues[1], queryValues[2]);
 
   return db
     .query(pgString)
     .then(({ rows }) => {
+      if (rows.length === 0 && topic !== undefined) {
+        return existsTopic("topics", topic);
+      }
       const articleArray = rows.map((article) => {
         return db
           .query(`SELECT * FROM comments WHERE article_id = $1`, [

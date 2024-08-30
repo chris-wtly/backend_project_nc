@@ -11,3 +11,14 @@ exports.exists = (table, id) => {
     }
   });
 };
+
+exports.existsTopic = (table, query) => {
+  const queryStr = pg("SELECT * FROM %I WHERE slug = $1;", table);
+  return db.query(queryStr, [query]).then((data) => {
+    if (data.rows.length === 0) {
+      return Promise.reject({ msg: "bad query" });
+    } else {
+      return Promise.all([]);
+    }
+  });
+};

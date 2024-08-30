@@ -527,3 +527,52 @@ describe("GET api/articles?sort_by", () => {
       });
   });
 });
+describe("/api/articels/?topic", () => {
+  it("200: Should return articles filtered by topic", () => {
+    return request(app)
+      .get("/api/articles?topic=cats")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toMatchObject([
+          {
+            article_id: 5,
+            article_img_url:
+              "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+            author: "rogersop",
+            comment_count: 2,
+            created_at: "2020-08-03T13:14:00.000Z",
+            title: "UNCOVERED: catspiracy to bring down democracy",
+            topic: "cats",
+            votes: 0,
+          },
+        ]);
+      });
+  });
+  it("400: Should return error for a query that does not exist", () => {
+    return request(app)
+      .get("/api/articles?topic=saxophone")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("bad request - bad query");
+      });
+  });
+  it("200: Should return empty array for a query that exists but has no article associated with it", () => {
+    return request(app)
+      .get("/api/articles?topic=paper")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toEqual([]);
+      });
+  });
+  it("200: Should work with other queries", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch&&sort_by=title&&order=ASC")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toBeSortedBy("title", { ascending: true });
+        articles.forEach((article) => {
+          expect(article.topic).toBe("mitch");
+        });
+      });
+  });
+});
