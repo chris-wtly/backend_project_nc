@@ -41,9 +41,8 @@ exports.getArticles = (req, res, next) => {
 };
 
 exports.getArticlesById = (req, res, next) => {
-  const query = req.query;
   const id = req.params.id;
-  return getArticlesByIdModel(id, query)
+  return getArticlesByIdModel(id)
     .then((data) => {
       res.status(200).send(data);
     })

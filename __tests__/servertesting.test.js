@@ -56,17 +56,14 @@ describe("/get/api/articles/:article_id ", () => {
       .expect(200)
       .then(({ body }) => {
         body = body.articles;
-        expect(body.length > 0);
-        body.forEach((body) => {
-          expect(body).toHaveProperty("author");
-          expect(body).toHaveProperty("title");
-          expect(body).toHaveProperty("article_id");
-          expect(body).toHaveProperty("body");
-          expect(body).toHaveProperty("topic");
-          expect(body).toHaveProperty("created_at");
-          expect(body).toHaveProperty("votes");
-          expect(body).toHaveProperty("article_img_url");
-        });
+        expect(body).toHaveProperty("author");
+        expect(body).toHaveProperty("title");
+        expect(body).toHaveProperty("article_id");
+        expect(body).toHaveProperty("body");
+        expect(body).toHaveProperty("topic");
+        expect(body).toHaveProperty("created_at");
+        expect(body).toHaveProperty("votes");
+        expect(body).toHaveProperty("article_img_url");
       });
   });
   it("404: Should receive an approperiate error message for an incorrect value of the correct data type", () => {
@@ -527,7 +524,7 @@ describe("GET api/articles?sort_by", () => {
       });
   });
 });
-describe("/api/articels/?topic", () => {
+describe("/api/articles/?topic", () => {
   it("200: Should return articles filtered by topic", () => {
     return request(app)
       .get("/api/articles?topic=cats")
@@ -576,29 +573,21 @@ describe("/api/articels/?topic", () => {
       });
   });
 });
-describe("/api/articles/:article_id?comment_count", () => {
+describe("/api/articles/:article_id", () => {
   it("200: Should return article object with comment_count attached with correct value", () => {
-    return request(app)
-      .get("/api/articles/9/?comment_count")
-      .expect(200)
-      .then(({ body: { articles } }) => {
-        expect(articles[0].comment_count).toBe(2);
-      });
-  });
-  it("200: Should return article object with comment_count with a value of 0 for an article with no comments", () => {
-    return request(app)
-      .get("/api/articles/4/?comment_count")
-      .expect(200)
-      .then(({ body: { articles } }) => {
-        expect(articles[0].comment_count).toBe(0);
-      });
-  });
-  it("200: Should return article object without comment_count when query isn't present", () => {
     return request(app)
       .get("/api/articles/9")
       .expect(200)
       .then(({ body: { articles } }) => {
-        expect(articles[0].comment_count).toBe(undefined);
+        expect(articles.comment_count).toBe(2);
+      });
+  });
+  it("200: Should return article object with comment_count with a value of 0 for an article with no comments", () => {
+    return request(app)
+      .get("/api/articles/4")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles.comment_count).toBe(0);
       });
   });
 });
