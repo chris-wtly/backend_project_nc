@@ -576,3 +576,29 @@ describe("/api/articels/?topic", () => {
       });
   });
 });
+describe("/api/articles/:article_id?comment_count", () => {
+  it("200: Should return article object with comment_count attached with correct value", () => {
+    return request(app)
+      .get("/api/articles/9/?comment_count")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles[0].comment_count).toBe(2);
+      });
+  });
+  it("200: Should return article object with comment_count with a value of 0 for an article with no comments", () => {
+    return request(app)
+      .get("/api/articles/4/?comment_count")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles[0].comment_count).toBe(0);
+      });
+  });
+  it("200: Should return article object without comment_count when query isn't present", () => {
+    return request(app)
+      .get("/api/articles/9")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles[0].comment_count).toBe(undefined);
+      });
+  });
+});
