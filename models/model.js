@@ -2,6 +2,7 @@ const db = require("../db/connection");
 const fs = require("fs/promises");
 const { exists } = require("../utilsFunctions");
 const pg = require("pg-format");
+const { articleData } = require("../db/data/test-data");
 
 exports.getTopicsModel = () => {
   return db.query(`SELECT * FROM topics`).then(({ rows }) => {
@@ -18,9 +19,42 @@ exports.getEndpointsModel = () => {
   });
 };
 
-exports.getArticlesModel = () => {
+exports.getArticlesModel = (lineQuery) => {
+  let queryValues = [];
+  let queryStr = `SELECT * FROM articles`;
+
+  if (lineQuery.sort_by !== undefined) {
+    queryStr += ` ORDER BY %I`;
+    if (lineQuery.sort_by === "") {
+      queryValues.push("created_at");
+    } else {
+      queryValues.push(lineQuery.sort_by);
+    }
+    if (!lineQuery.order) {
+      queryStr += ` DESC`;
+    } else {
+      queryStr += ` ASC`;
+    }
+  } else {
+    if (!lineQuery.order) {
+      queryStr += ` ORDER BY created_at DESC`;
+    } else {
+      queryStr += ` ORDER BY created_at ASC`;
+    }
+  }
+
+  if (
+    lineQuery.order !== "ASC" &&
+    lineQuery.order !== "DESC" &&
+    lineQuery.order !== undefined
+  ) {
+    return Promise.reject({ msg: "bad query" });
+  }
+
+  const pgString = pg(queryStr, queryValues);
+
   return db
-    .query(`SELECT * FROM articles ORDER BY created_at DESC`)
+    .query(pgString)
     .then(({ rows }) => {
       const articleArray = rows.map((article) => {
         return db
@@ -81,6 +115,9 @@ exports.postCommentModel = (id, data) => {
 };
 
 exports.patchArticleModel = (id, data) => {
+  if (Number(id) * 0 !== 0) {
+    return Promise.reject({ msg: "invalid_id" });
+  }
   return db
     .query(
       `UPDATE articles SET votes = votes + $1 WHERE article_id = $2 returning *, to_char(created_at, 'YYYY-MM-DD HH24:MI:SS') as created_at`,
@@ -88,7 +125,7 @@ exports.patchArticleModel = (id, data) => {
     )
     .then(({ rows }) => {
       if (rows.length === 0) {
-        return Promise.reject({ msg: "Page not found - invalid Id" });
+        return Promise.reject({ msg: "Id_incorrect" });
       }
       return rows[0];
     });
