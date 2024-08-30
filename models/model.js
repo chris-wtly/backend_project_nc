@@ -80,7 +80,32 @@ exports.getArticlesModel = (lineQuery) => {
     });
 };
 
-exports.getArticlesByIdModel = (id) => {
+exports.getArticlesByIdModel = (id, query) => {
+  const { comment_count } = query;
+  if (comment_count === "") {
+    return db
+      .query(`SELECT * FROM articles WHERE article_id = $1`, [id])
+      .then(({ rows }) => {
+        if (rows.length === 0) {
+          return Promise.reject({ msg: "Page not found - invalid Id" });
+        }
+        const articleArray = rows.map((article) => {
+          return db
+            .query(`SELECT * FROM comments WHERE article_id = $1`, [
+              article.article_id,
+            ])
+            .then(({ rows }) => {
+              article.comment_count = rows.length;
+              return article;
+            });
+        });
+        return Promise.all(articleArray);
+      })
+      .then((data) => {
+        return { articles: data };
+      });
+  }
+
   return db
     .query(`SELECT * FROM articles WHERE article_id = $1`, [id])
     .then(({ rows }) => {
