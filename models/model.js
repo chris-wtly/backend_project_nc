@@ -36,13 +36,14 @@ exports.getArticlesModel = (lineQuery) => {
     } else {
       queryValues.push(lineQuery.sort_by);
     }
-    if (!order) {
+    if (order === undefined) {
       queryStr += ` DESC`;
     } else {
-      queryStr += ` ASC`;
+      queryStr += ` %s`;
+      queryValues.push(order);
     }
   } else {
-    if (!order) {
+    if (order === undefined) {
       queryStr += ` ORDER BY created_at DESC`;
     } else {
       queryStr += ` ORDER BY created_at %s`;
@@ -80,39 +81,17 @@ exports.getArticlesModel = (lineQuery) => {
     });
 };
 
-exports.getArticlesByIdModel = (id, query) => {
-  const { comment_count } = query;
-  if (comment_count === "") {
-    return db
-      .query(`SELECT * FROM articles WHERE article_id = $1`, [id])
-      .then(({ rows }) => {
-        if (rows.length === 0) {
-          return Promise.reject({ msg: "Page not found - invalid Id" });
-        }
-        const articleArray = rows.map((article) => {
-          return db
-            .query(`SELECT * FROM comments WHERE article_id = $1`, [
-              article.article_id,
-            ])
-            .then(({ rows }) => {
-              article.comment_count = rows.length;
-              return article;
-            });
-        });
-        return Promise.all(articleArray);
-      })
-      .then((data) => {
-        return { articles: data };
-      });
-  }
-
+exports.getArticlesByIdModel = (id) => {
   return db
-    .query(`SELECT * FROM articles WHERE article_id = $1`, [id])
+    .query(
+      `SELECT articles.*, COUNT(comments.*)::INT AS comment_count FROM articles LEFT JOIN comments ON articles.article_id = comments.article_id WHERE articles.article_id = $1 GROUP BY articles.article_id`,
+      [id]
+    )
     .then(({ rows }) => {
       if (rows.length === 0) {
         return Promise.reject({ msg: "Page not found - invalid Id" });
       }
-      return { articles: rows };
+      return { articles: rows[0] };
     });
 };
 
